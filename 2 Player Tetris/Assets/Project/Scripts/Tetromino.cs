@@ -6,6 +6,9 @@ public class Tetromino : MonoBehaviour
     private Rigidbody2D rb;
     private bool isLocked = false;
 
+    private float lockDelay = 0.2f; 
+    private float lockTimer = 0f;
+
     public void InitializeShape(Vector2Int[] newShape)
     {
         shape = newShape;
@@ -14,14 +17,25 @@ public class Tetromino : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
     }
+    private void Update()
+    {
+        if (lockTimer > 0f && Time.time >= lockTimer)
+        {
+            LockTetromino();
+            lockTimer = 0f;
+        }
+    }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (isLocked) return;
+        if (isLocked) return; 
 
-        if (!isLocked && collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Block"))
+        foreach (ContactPoint2D contact in collision.contacts)
         {
-            LockTetromino();
+            if (contact.normal == Vector2.up) 
+            {
+                lockTimer = Time.time + lockDelay;
+            }
         }
     }
 
@@ -31,6 +45,9 @@ public class Tetromino : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
         rb.bodyType = RigidbodyType2D.Static;
         gameObject.tag = "Block";
+
+        Vector2 roundedPos = new Vector2(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y));
+        transform.position = roundedPos;
 
         GetComponent<TetrominoController>().enabled = false;
         FindObjectOfType<TetrominoSpawner>().SpawnRandomTetromino();

@@ -5,8 +5,8 @@ public class TetrominoController : MonoBehaviour
 {
     private GameControls controls; 
     public float moveSpeed = 1f;
-    public float fallSpeed = 1f;
-    public float fastFallMultiplier = 5f;
+    public float fallSpeed = 2f;
+    public float fastFallMultiplier = 4f;
     private Rigidbody2D rb;
 
     private void Awake()
